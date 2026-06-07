@@ -1,4 +1,4 @@
-package com.hohuy.bookstore.dto;
+package com.hohuy.bookstore.modules.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDto {
+public class bookDto {
     private Long id;
     private String title;
     private String url;

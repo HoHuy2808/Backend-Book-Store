@@ -1,4 +1,4 @@
-package com.hohuy.bookstore.model;
+package com.hohuy.bookstore.modules.book;
 
 
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "book")
-public class Book {
+public class bookEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
