@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erdiagram {
+  provider = "prisma-erd-generator"
+  output   = "../ERD.pdf"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  DELIVERY
+  DONE
+  CANCELED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+}
+
+// ─── Users ────────────────────────────────────
+model User {
+  id           String   @id @default(cuid())
+  phone        String?  @unique
+  passwordHash String?  @unique
+  isActive     Boolean  @default(true) @map("is_active")
+  role         Role[]   @default([CUSTOMER])
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile       UserProfile?
+  orders        Order[]
+  reviews       Review[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  userId    String    @id @map("user_id")
+  fullName  String    @map("full_name")
+  avatarUrl String?   @map("avatar_url")
+  dob       DateTime?
+  gender    String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profile")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─── Books ────────────────────────────────────
+model Book {
+  id        String   @id @default(cuid())
+  title     String
+  price     Decimal  @db.Decimal(12, 2)
+  stock     Int      @default(0)
+  image     String?
+  genres    Json?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orderItems  OrderItems[]
+  BookDetails BookDetails[]
+  Review      Review[]
+
+  @@map("books")
+}
+
+model BookDetails {
+  bookId      String    @id @map("book_id")
+  isbn        String?   @unique
+  publishDate DateTime? @map("publish_date")
+  publisher   String?
+  format      String?
+  pages       Int?
+  language    String?
+  award       Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("book_details")
+}
+
+// ─── Orders ────────────────────────────────────
+model Order {
+  id            String        @id @default(cuid())
+  customerId    String        @map("customer_id")
+  total         Decimal       @db.Decimal(12, 2)
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(UNPAID)
+  isDeleted     Boolean       @default(false)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  customer User         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items    OrderItems[]
+
+  @@map("orders")
+}
+
+model OrderItems {
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  bookId    String   @map("book_id")
+  quantity  Int
+  price     Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─── Reviews ────────────────────────────────────
+model Review {
+  id         String   @id @default(cuid())
+  customerId String   @map("customer_id")
+  bookId     String   @map("book_id")
+  content    String?
+  rating     Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  book     Book @relation(fields: [bookId], references: [id])
+
+  @@map("reviews")
+}
