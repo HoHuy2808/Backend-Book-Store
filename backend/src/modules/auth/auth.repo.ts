@@ -3,6 +3,19 @@ import { Prisma } from "@prisma/client"
 
 export const createUser = (data: Prisma.UserCreateInput) => {
     return prisma.user.create({
-        data: data
+        data,
+        include: { profile: true }
+    })
+}
+
+export const findUserByPhone = (phone: string) => {
+    return prisma.user.findUnique({
+        where: { phone: phone }
+    })
+}
+
+export const createRefreshToken = (token: string, userId: string, expiresAt: Date) => {
+    return prisma.refreshToken.create({
+        data: {token, userId, expiresAt}
     })
 }

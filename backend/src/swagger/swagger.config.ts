@@ -14,7 +14,7 @@ const swaggerOptions = {
         },
         servers: [{ url: `http://localhost:${process.env.PORT}` }],
     },
-    apis: ['./scr/modules/**/*.router..js'], // Path to API docs
+    apis: ['./src/modules/**/*.router.ts', './src/modules/**/*.schema.ts'], // Path to API docs
 }
 export const swaggerDocs = swaggerJSDoc(swaggerOptions);
 export function setupSwagger(app: Express): void {

@@ -2,8 +2,9 @@
 .env
 !.env.example
 
-# Dependencies
+# Fol
 node_modules
+dist
 
 # Trash file
 *.pdf
