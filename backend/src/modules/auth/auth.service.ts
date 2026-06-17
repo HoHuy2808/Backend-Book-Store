@@ -49,7 +49,7 @@ export const login = async (body: {
     if (!isMatch) throw new Error(`Số điện thoại hoặc mật khẩu không đúng`)
 
     const accessToken = createAccessToken(user.id, user.role)
-    const refreshToken = createRefreshToken(user.id, new Date())
+    const refreshToken = await createRefreshToken(user.id, new Date())
     return {
         accessToken,
         refreshToken,
@@ -57,6 +57,23 @@ export const login = async (body: {
     }
 }
 
+export const changePassword = async (body: { phone: string, newPass: string }) => {
+    const { phone, newPass } = body;
+    if (phone.length < 10) throw new Error(`Phone number must be at least 10 number`)
+    if (!newPass) {
+        throw new Error('New password is required');
+    }
+    const salt = await bcrypt.genSalt(12)
+    const passwordHash = await bcrypt.hash(newPass, salt)
+
+    const user = await authRepo.findUserByPhone(phone)
+    if (!user) {
+        throw new Error('User not found');
+    }
+    await authRepo.updateUserPassword(user.id, passwordHash)
+}
+
+// Token
 export const createAccessToken = (userId: string, role: Role[]) => {
     const secret = process.env.JWT_ACCESS_TOKEN
     const expiresIn = process.env.JWT_EXPIRES_IN
@@ -79,8 +96,11 @@ export const createAccessToken = (userId: string, role: Role[]) => {
 
 export const createRefreshToken = async (userId: string, now: Date) => {
     const newRefreshToken = generateRefreshToken(now)
+
+    // Xóa các refresh token cũ của user để đảm bảo chỉ có 1 refresh token tại 1 thời điểm
+    await authRepo.deleteUserRefreshToken(userId)
     await authRepo.createRefreshToken(
-        createHash('shad256').update(newRefreshToken).digest('hex'),
+        createHash('sha256').update(newRefreshToken).digest('hex'),
         userId,
         new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // + 30 days
     )
