@@ -1,6 +1,6 @@
 # Backend Book Store
 
-An Ecommerce backend API for an book store application, built with TypeScript, Prisma, and Swagger.
+An backend API for an book store application, built with TypeScript, Prisma, and Swagger.
 
 ## 🚀 Features
 - **Authentication (`/auth`):** Secure user registration and login.
