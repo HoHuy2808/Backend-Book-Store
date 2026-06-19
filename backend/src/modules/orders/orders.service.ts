@@ -1,15 +1,29 @@
 import { prisma } from '@/config/prisma';
 import * as orderRepo from './orders.repo'
 import * as bookRepo from '../book/book.repo'
-import { OrderItems, OrderStatus } from '@prisma/client';
+import { OrderItems, OrderStatus, Role } from '@prisma/client';
 
 // TODO: Implement business logic cho module orders
-export const getAll = async (query?: any) => {
-  return [];
+export const getAllOrder = async (role?: Role) => {
+  if (role === Role.ADMIN) {
+    return orderRepo.getAllOrder();
+  }
+
+  return orderRepo.getAllOrderActive();
 };
 
-export const getById = async (id: string) => {
-  throw new Error('ChÆ°a implement');
+export const getOrderById = async (id: string, role?: Role) => {
+  const order = await orderRepo.getOrderById(id)
+  if (!order) throw new Error(`Đơn hàng không tồn tại`)
+  if (role === Role.ADMIN) {
+    return order;
+  }
+  if (role === Role.CUSTOMER) {
+    if (order.isDeleted === true) {
+      throw new Error("Đơn hàng không tồn tại");
+    }
+    return order;
+  }
 };
 
 export const createOrder = async (
@@ -59,7 +73,7 @@ export const updateOrder = async (
 
     /**
      * Customer can only update book's quantity or add more book in Order
-     * Only if Order's status is PENDING
+     * only if Order's status is PENDING
      * If status is not PENDING -> create new Order 
      */
     if (order.status !== OrderStatus.PENDING) {
@@ -122,6 +136,37 @@ export const updateOrder = async (
   })
 };
 
-export const remove = async (id: string) => {
-  throw new Error('ChÆ°a implement');
+export const cancelOrder = async (
+  orderId: string
+) => {
+  return prisma.$transaction(async(tx: any) => {
+    const order = await orderRepo.findOrderById(orderId);
+    if(!order) throw new Error(`Order doesn't exist`);
+    if(order.status!==OrderStatus.PENDING && order.status!==OrderStatus.CONFIRMED){
+      throw new Error(`Can't cancel the order`);
+    };
+    // Update order status
+    const updateStatus = await orderRepo.updateOrderStatus(tx, orderId, OrderStatus.CANCELED);
+    
+    // Return book's quantity back to stock
+    for(const item of order.items){
+      await bookRepo.incrementStock(tx, item.bookId, item.quantity);
+    };
+    return updateStatus;
+  })
+}
+
+export const deleteOrder = async (orderId: string) => {
+  const order = await orderRepo.findOrderById(orderId);
+  if(!order) throw new Error(`Order doesn't exist`);
+  if(order.status!==OrderStatus.CANCELED && order.status!==OrderStatus.DONE){
+    throw new Error(`Can't delete the order`);
+  };
+  const updateIsDeleted = await orderRepo.idDeleted(orderId);
+  return updateIsDeleted;
+
+}
+
+export const remove = async (orderId: string) => {
+  await orderRepo.remove(orderId)
 };
