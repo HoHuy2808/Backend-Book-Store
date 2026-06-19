@@ -1,12 +1,16 @@
 import express from 'express'
 import dotenv from "dotenv"
 
-import authRouter from './modules/auth/auth.router'
 import { createServer } from 'http';
+// import { setupSwagger } from './swagger/swagger.config';
 import { setupSwagger } from './swagger/swagger.config';
+import swaggerUi from 'swagger-ui-express';
+
 import helmet from 'helmet';
-// import bookRouter from './modules/books/books.router'
-// import orderRouter from './modules/orders/orders.router'
+
+import authRouter from './modules/auth/auth.router'
+import bookRouter from './modules/book/book.router'
+import orderRouter from './modules/orders/orders.router'
 // import reviewRouter from './modules/reviews/reviews.router'
 
 dotenv.config()
@@ -17,14 +21,16 @@ const httpServer = createServer(app);
 app.use(helmet());
 app.use(express.json());
 
+// Swagger docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(setupSwagger));
+
 // API Routers
 app.use(`/api/auth`, authRouter)
-// app.use(`/api/books`,bookRouter)
-// app.use(`/api/orders`,orderRouter)
+app.use(`/api/books`,bookRouter)
+app.use(`/api/orders`,orderRouter)
 // app.use(`/api/reviews`,reviewRouter)
 
-// Swagger docs
-setupSwagger(app);
+// setupSwagger(app);
 
 // ─── Start Server ─────────────────────────────
 httpServer.listen(process.env.PORT, () => {

@@ -26,9 +26,9 @@ export const createBook = (data: Prisma.BookCreateInput) => {
     })
 }
 
-export const findBookById = (id: string) => {
+export const findBookById = (bookId: string) => {
     return prisma.book.findUnique({
-        where: { id }
+        where: { id: bookId }
     })
 }
 
@@ -55,5 +55,28 @@ export const updateBookDetails = (bookId: string, data: Prisma.BookDetailsUpdate
 export const deleteBook = (id: string) => {
     return prisma.book.delete({
         where: {id}
+    })
+}
+
+// Transaction in Order process
+export const decrementStock = async (
+    tx: any,
+    bookId: string,
+    quantity: number
+) => {
+    return await tx.book.update({
+        where: { id: bookId },
+        data: { stock: { decrement: quantity } }
+    })
+}
+
+export const incrementStock = async (
+    tx: any,
+    bookId: string,
+    quantity: number
+) => {
+    return await tx.book.update({
+        where: { id: bookId },
+        data: { stock: { increment: quantity } }
     })
 }

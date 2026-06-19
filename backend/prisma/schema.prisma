@@ -95,7 +95,7 @@ model Book {
 model BookDetails {
   bookId      String    @id @map("book_id")
   isbn        String?   @unique
-  publishDate DateTime? @map("publish_date")
+  publishDate String? @map("publish_date")
   publisher   String?
   format      String?
   pages       Int?
