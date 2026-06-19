@@ -9,7 +9,7 @@ export const checkRole = (...roles: Role[]) => {
         message: "Unauthorized"
       });
     }
-    const hasPermission = req.user.roles.some(role => roles.includes(role));
+    const hasPermission = req.user.role.some(role => roles.includes(role));
     if (!hasPermission) {
       return res.sendStatus(403).json({
         messages: 'Permission Denied'

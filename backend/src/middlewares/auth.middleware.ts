@@ -6,7 +6,7 @@ dotenv.config()
 
 interface AuthPayload extends Request {
     userId: string;
-    roles: Role[]
+    role: Role[]
 }
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
