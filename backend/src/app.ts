@@ -2,7 +2,6 @@ import express from 'express'
 import dotenv from "dotenv"
 
 import { createServer } from 'http';
-// import { setupSwagger } from './swagger/swagger.config';
 import { setupSwagger } from './swagger/swagger.config';
 import swaggerUi from 'swagger-ui-express';
 
@@ -11,7 +10,7 @@ import helmet from 'helmet';
 import authRouter from './modules/auth/auth.router'
 import bookRouter from './modules/book/book.router'
 import orderRouter from './modules/orders/orders.router'
-// import reviewRouter from './modules/reviews/reviews.router'
+import reviewRouter from './modules/review/review.router'
 
 dotenv.config()
 
@@ -28,9 +27,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(setupSwagger));
 app.use(`/api/auth`, authRouter)
 app.use(`/api/books`,bookRouter)
 app.use(`/api/orders`,orderRouter)
-// app.use(`/api/reviews`,reviewRouter)
-
-// setupSwagger(app);
+app.use(`/api/reviews`,reviewRouter)
 
 // ─── Start Server ─────────────────────────────
 httpServer.listen(process.env.PORT, () => {

@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
 import * as orderController from './orders.controller';
 import { requireAdmin } from '@/middlewares/role.middleware';
+import { createOrderSchema, updateOrderSchema } from './orders.schema';
+import { validate } from '@/middlewares/validate.middleware';
 
 const router = Router();
 
@@ -21,7 +23,6 @@ const router = Router();
  *       403:
  *         description: Không có quyền truy cập
  */
-router.get('/get-all-order', authMiddleware, orderController.getAll);
 router.get('/get-all-order', authMiddleware, orderController.getAll);
 
 /**
@@ -64,7 +65,7 @@ router.get('/get-order/:id', authMiddleware, orderController.getById);
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-router.post('/create-order', authMiddleware, orderController.create);
+router.post('/create-order', authMiddleware, validate(createOrderSchema), orderController.create);
 
 
 /**
@@ -98,7 +99,7 @@ router.post('/create-order', authMiddleware, orderController.create);
  *       404:
  *         description: Không tìm thấy đơn hàng
  */
-router.patch('/update-order/:id', authMiddleware, orderController.update);
+router.patch('/update-order/:id', authMiddleware, validate(updateOrderSchema), orderController.update);
 
 /**
  * @swagger
@@ -177,6 +178,6 @@ router.patch('/delete-order/:id', authMiddleware, orderController.isDeleted);
  *       404:
  *         description: Không tìm thấy đơn hàng
  */
-router.delete('/remove-order/:id', authMiddleware, orderController.remove);
+router.delete('/remove-order/:id', authMiddleware, requireAdmin, orderController.remove);
 
 export default router;

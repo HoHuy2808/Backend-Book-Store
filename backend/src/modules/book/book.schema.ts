@@ -64,8 +64,20 @@ import { z } from 'zod'
  *             - "Jolt Award"
  */
 export const createBookSchema = z.object({
+    title: z.string().min(1, 'Title is require'),
+    price: z.number().positive("Price must be greater than 0"),
+    stock: z.number().int("Stock must be an integer").min(0, "Stock cannot be negative"),
+    image: z.string().optional(),
+    genres: z.array(z.string()),
+    isbn: z.string().min(10, "ISBN is too short"),
+    publishDate: z.string().date("Invalid publish date"),
+    publisher: z.string().min(1, "Publisher is required"),
+    format: z.string().min(1, "Format is required"),
+    pages: z.number().int("Pages must be an integer").positive("Pages must be greater than 0"),
+    language: z.string().min(1, "Language is required"),
+    award: z.array(z.string()).optional(),
+});
 
-})
 
 /**
  * @swagger
@@ -140,4 +152,24 @@ export const createBookSchema = z.object({
  *           pages: 500
  *           publisher: "Prentice Hall"
  */
-export const updateBookSchema = z.object
+// export const updateBookSchema = z.object
+export const updateBookSchema = z.object({
+  book: z.object({
+      title: z.string().min(1, "Title is required").optional(),
+      price: z.number().positive("Price must be greater than 0").optional(),
+      stock: z.number().int("Stock must be an integer").min(0, "Stock cannot be negative").optional(),
+      image: z.string().optional(),
+      genres: z.array(z.string()).optional(),
+      isActive: z.boolean().optional(),
+    }).optional(),
+
+  details: z.object({
+      isbn: z.string().min(10, "ISBN is too short").optional(),
+      publishDate: z.string().date("Invalid publish date").optional(),
+      publisher: z.string().min(1, "Publisher is required").optional(),
+      format: z.string().min(1, "Format is required").optional(),
+      pages: z.number().int("Pages must be an integer").positive("Pages must be greater than 0").optional(),
+      language: z.string().min(1, "Language is required").optional(),
+      award: z.array(z.string()).optional(),
+    }).optional(),
+});

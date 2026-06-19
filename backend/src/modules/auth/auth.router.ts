@@ -4,12 +4,6 @@ import { validate } from '@/middlewares/validate.middleware';
 import { changePasswordSchema, loginRequestSchema, registerRequestSchema } from './auth.schema';
 
 export const router = Router();
-/**
- * @swagger
- * tags:
- *   name: Auth
- *   description: Authentication APIs
- */
 
 /**
  * @swagger

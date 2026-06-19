@@ -1,6 +1,8 @@
 ﻿import { Router } from 'express';
 import { authMiddleware } from '@/middlewares/auth.middleware';
 import * as reviewController from './review.controller';
+import { validate } from '@/middlewares/validate.middleware';
+import { createReviewSchema, updateReviewSchema } from './review.schema';
 
 const router = Router();
 
@@ -31,7 +33,7 @@ const router = Router();
  *       404:
  *         description: Book not found
  */
-router.post('/post-review', authMiddleware, reviewController.create);
+router.post('/post-review', authMiddleware, validate(createReviewSchema), reviewController.create);
 
 /**
  * @swagger
@@ -72,7 +74,7 @@ router.post('/post-review', authMiddleware, reviewController.create);
  *       404:
  *         description: Review not found
  */
-router.patch('/update/:id', authMiddleware, reviewController.update);
+router.patch('/update/:id', authMiddleware, validate(updateReviewSchema), reviewController.update);
 
 /**
  * @swagger

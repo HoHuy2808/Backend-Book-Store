@@ -28,7 +28,20 @@ import { z } from 'zod'
  *                 minimum: 1
  *                 example: 2
  */
-export const createOrderSchema = z.object
+export const createOrderSchema = z.object({
+  items: z.array(
+      z.object({
+        bookId: z
+          .string()
+          .min(1, "Book ID is required"),
+
+        quantity: z
+          .number()
+          .int("Quantity must be an integer")
+          .min(1, "Quantity must be at least 1"),
+      })
+    ).min(1, "Order must contain at least one item"),
+});
 
 /**
  * @swagger
@@ -56,4 +69,19 @@ export const createOrderSchema = z.object
  *                 minimum: 1
  *                 example: 3
  */
-export const updateOrderSchema = z.object
+export const updateOrderSchema = z.object({
+  items: z.array(
+      z.object({
+        bookId: z
+          .string()
+          .min(1, "Book ID is required"),
+
+        quantity: z
+          .number()
+          .int("Quantity must be an integer")
+          .min(1, "Quantity must be at least 1"),
+      })
+    )
+    .min(1, "Order must contain at least one item")
+    .optional(),
+});

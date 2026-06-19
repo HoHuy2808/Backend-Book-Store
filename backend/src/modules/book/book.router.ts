@@ -1,16 +1,12 @@
 ﻿import { Router } from 'express';
 // import { authMiddleware } from '@/middlewares/auth.middleware';
 import * as bookController from './book.controller';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+import { requireAdmin } from '@/middlewares/role.middleware';
+import { validate } from '@/middlewares/validate.middleware';
+import { createBookSchema, updateBookSchema } from './book.schema';
 
 const router = Router();
-
-// TODO: Äá»‹nh nghÄ©a routes cho module products
-/**
- * @swagger
- * tags:
- *   name: Book
- *   description: Book APIs
- */
 
 /**
  * @swagger
@@ -45,8 +41,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-// router.get('/', authMiddleware, controller.getAll);
-router.get('/get-all-books', bookController.getAll);
+router.get('/get-all-books', authMiddleware, bookController.getAll);
 
 /**
  * @swagger
@@ -70,8 +65,7 @@ router.get('/get-all-books', bookController.getAll);
  *       404:
  *         description: Không tìm thấy sách
  */
-// router.get('/:id', authMiddleware, controller.getById);
-router.get('/get-book/:id', bookController.getById);
+router.get('/get-book/:id', authMiddleware, bookController.getById);
 
 /**
  * @swagger
@@ -91,8 +85,7 @@ router.get('/get-book/:id', bookController.getById);
  *       201:
  *         description: Tạo sản phẩm thành công
  */
-// router.post('/', authMiddleware, controller.create);
-router.post('/add', bookController.create);
+router.post('/add', authMiddleware, requireAdmin, validate(createBookSchema), bookController.create);
 
 /**
  * @swagger
@@ -122,8 +115,7 @@ router.post('/add', bookController.create);
  *       404:
  *         description: Không tìm thấy sản phẩm
  */
-// router.put('/:id', authMiddleware, controller.update);
-router.patch('/update-book/:id', bookController.update);
+router.patch('/update-book/:id', authMiddleware, requireAdmin, validate(updateBookSchema), bookController.update);
 
 
 /**
@@ -149,6 +141,6 @@ router.patch('/update-book/:id', bookController.update);
  *         description: Không tìm thấy sản phẩm
  */
 // router.delete('/:id', authMiddleware, controller.remove);
-router.delete('/delete-book/:id', bookController.remove);
+router.delete('/delete-book/:id', authMiddleware, requireAdmin, bookController.remove);
 
 export default router;
