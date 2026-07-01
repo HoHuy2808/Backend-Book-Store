@@ -34,11 +34,16 @@ Copy the example environment file and fill in your database credentials:
 `cp .env.example .env`
 Open the newly created .env file and update your DATABASE_URL.
 
-### 3. Database Migration
+### 3. Docker
+Run `docker compose up -d` to start the database.
+
+### 4. Database Migration
+Generate Prisma client:
+`npx prisma generate`
 Run Prisma migrations to set up your database schema:
 `npx prisma migrate dev`
 
-### 4. Run the Application
+### 5. Run the Application
 `npm run dev`
 
 ## 📖 API Documentation
