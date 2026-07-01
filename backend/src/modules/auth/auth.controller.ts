@@ -28,3 +28,16 @@ export const changePassword = async (req:Request, res:Response, next:NextFunctio
         next(error)
     }
 }
+
+export const renewAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user!.userId;
+        const role = req.user!.role;
+        const { refreshToken } = req.body;
+        const result = await authService.renewAccessToken(userId, role, refreshToken);
+        res.json({ success: true, data: result })
+
+    } catch (error) {
+        next(error)
+    }
+}

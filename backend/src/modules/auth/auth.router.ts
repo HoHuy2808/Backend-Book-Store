@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import * as authController from './auth.controller'
 import { validate } from '@/middlewares/validate.middleware';
-import { changePasswordSchema, loginRequestSchema, registerRequestSchema } from './auth.schema';
+import { changePasswordSchema, loginRequestSchema, refreshTokenSchema, registerRequestSchema } from './auth.schema';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 
 export const router = Router();
 
@@ -82,6 +83,28 @@ router.post('/login', validate(loginRequestSchema), authController.login)
  *             schema:
  */
 router.patch('/change-password', validate(changePasswordSchema), authController.changePassword)
+
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Refresh access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/refreshTokenSchema'
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *       401:
+ *         description: Invalid refresh token
+ */
+router.post('/refresh', authMiddleware, validate(refreshTokenSchema), authController.renewAccessToken);
+
 // router.get
 // router.delete
 

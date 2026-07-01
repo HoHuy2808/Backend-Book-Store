@@ -79,3 +79,21 @@ export const changePasswordSchema = z.object({
         {required_error: `Password can't be blank`}
     ).min(6, 'Password must have at least 6 character')
 })
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     refreshTokenSchema:
+ *       type: object
+ *       required:
+ *         - refreshToken
+ *       properties:
+ *         refreshToken:
+ *           type: string
+ *           minLength: 10
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token.example"
+ */
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(10, 'Refresh Token không hợp lệ')
+});
